@@ -64,6 +64,7 @@ class Stream():
     def __init__(self, client=None, config=None):
         self.client = client
         self.config = config
+        self.auth = (f'{config["email"]}/token', config["access_token"])
         # Set and pass request timeout to config param `request_timeout` value.
         config_request_timeout = self.config.get('request_timeout')
         if config_request_timeout and float(config_request_timeout):
@@ -127,7 +128,7 @@ class Stream():
         url = self.endpoint.format(self.config['subdomain'])
         HEADERS['Authorization'] = 'Bearer {}'.format(self.config["access_token"])
 
-        http.call_api(url, self.request_timeout, params={'per_page': 1}, headers=HEADERS)
+        http.call_api(url, self.request_timeout, auth=self.auth, params={'per_page': 1}, headers=HEADERS)
 
 class CursorBasedStream(Stream):
     item_key = None
@@ -343,7 +344,7 @@ class Tickets(CursorBasedExportStream):
         start_time = datetime.datetime.strptime(self.config['start_date'], START_DATE_FORMAT).timestamp()
         HEADERS['Authorization'] = 'Bearer {}'.format(self.config["access_token"])
 
-        http.call_api(url, self.request_timeout, params={'start_time': start_time, 'per_page': 1}, headers=HEADERS)
+        http.call_api(url, self.request_timeout, auth=self.auth, params={'start_time': start_time, 'per_page': 1}, headers=HEADERS)
 
 
 class TicketAudits(Stream):
@@ -375,7 +376,7 @@ class TicketAudits(Stream):
         url = self.endpoint.format(self.config['subdomain'], '1')
         HEADERS['Authorization'] = 'Bearer {}'.format(self.config["access_token"])
         try:
-            http.call_api(url, self.request_timeout, params={'per_page': 1}, headers=HEADERS)
+            http.call_api(url, self.request_timeout, auth=self.auth, params={'per_page': 1}, headers=HEADERS)
         except http.ZendeskNotFoundError:
             #Skip 404 ZendeskNotFoundError error as goal is just to check whether TicketComments have read permission or not
             pass
@@ -404,7 +405,7 @@ class TicketMetrics(CursorBasedStream):
         url = self.endpoint.format(self.config['subdomain'], '1')
         HEADERS['Authorization'] = 'Bearer {}'.format(self.config["access_token"])
         try:
-            http.call_api(url, self.request_timeout, params={'per_page': 1}, headers=HEADERS)
+            http.call_api(url, self.request_timeout, auth=self.auth, params={'per_page': 1}, headers=HEADERS)
         except http.ZendeskNotFoundError:
             #Skip 404 ZendeskNotFoundError error as goal is just to check whether TicketComments have read permission or not
             pass
@@ -466,7 +467,7 @@ class TicketComments(Stream):
         url = self.endpoint.format(self.config['subdomain'], '1')
         HEADERS['Authorization'] = 'Bearer {}'.format(self.config["access_token"])
         try:
-            http.call_api(url, self.request_timeout, params={'per_page': 1}, headers=HEADERS)
+            http.call_api(url, self.request_timeout, auth=self.auth, params={'per_page': 1}, headers=HEADERS)
         except http.ZendeskNotFoundError:
             #Skip 404 ZendeskNotFoundError error as goal is to just check to whether TicketComments have read permission or not
             pass

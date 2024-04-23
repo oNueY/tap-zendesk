@@ -28,6 +28,7 @@ def discover_streams(client, config):
     streams = []
     error_list = []
     refs = load_shared_schema_refs()
+    config["access_token"] = config["api_token"]
 
 
     for stream in STREAMS.values():

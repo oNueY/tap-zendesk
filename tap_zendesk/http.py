@@ -144,8 +144,8 @@ def raise_for_error(response):
                     (ConnectionError, ConnectionResetError, Timeout, ChunkedEncodingError, ProtocolError),#As ConnectionError error and timeout error does not have attribute status_code,
                     max_tries=5, # here we added another backoff expression.
                     factor=2)
-def call_api(url, request_timeout, params, headers):
-    response = requests.get(url, params=params, headers=headers, timeout=request_timeout) # Pass request timeout
+def call_api(url, request_timeout, auth, params, headers):
+    response = requests.get(url, params=params, headers=headers, auth=auth, timeout=request_timeout) # Pass request timeout
     raise_for_error(response)
     return response
 
