@@ -140,7 +140,7 @@ class CursorBasedStream(Stream):
         '''
         url = self.endpoint.format(self.config['subdomain'])
         # Pass `request_timeout` parameter
-        for page in http.get_cursor_based(url, self.config['access_token'], self.request_timeout, self.page_size, **kwargs):
+        for page in http.get_cursor_based(url, self.config['access_token'], self.request_timeout, self.page_size, auth=self.auth, **kwargs):
             yield from page[self.item_key]
 
 class CursorBasedExportStream(Stream):
@@ -153,7 +153,7 @@ class CursorBasedExportStream(Stream):
         '''
         url = self.endpoint.format(self.config['subdomain'])
         # Pass `request_timeout` parameter
-        for page in http.get_incremental_export(url, self.config['access_token'], self.request_timeout, start_time):
+        for page in http.get_incremental_export(url, self.config['access_token'], self.request_timeout, start_time, auth=self.auth):
             yield from page[self.item_key]
 
 
@@ -357,7 +357,7 @@ class TicketAudits(Stream):
     def get_objects(self, ticket_id):
         url = self.endpoint.format(self.config['subdomain'], ticket_id)
         # Pass `request_timeout` parameter
-        pages = http.get_offset_based(url, self.config['access_token'], self.request_timeout, self.page_size)
+        pages = http.get_offset_based(url, self.config['access_token'], self.request_timeout, self.page_size, auth=self.auth)
         for page in pages:
             yield from page[self.item_key]
 
@@ -392,7 +392,7 @@ class TicketMetrics(CursorBasedStream):
         # Only 1 ticket metric per ticket
         url = self.endpoint.format(self.config['subdomain'], ticket_id)
         # Pass `request_timeout`
-        pages = http.get_offset_based(url, self.config['access_token'], self.request_timeout, self.page_size)
+        pages = http.get_offset_based(url, self.config['access_token'], self.request_timeout, self.page_size, auth=self.auth)
         for page in pages:
             zendesk_metrics.capture('ticket_metric')
             self.count += 1
@@ -448,7 +448,7 @@ class TicketComments(Stream):
     def get_objects(self, ticket_id):
         url = self.endpoint.format(self.config['subdomain'], ticket_id)
         # Pass `request_timeout` parameter
-        pages = http.get_offset_based(url, self.config['access_token'], self.request_timeout, self.page_size)
+        pages = http.get_offset_based(url, self.config['access_token'], self.request_timeout, self.page_size, auth=self.auth)
 
         for page in pages:
             yield from page[self.item_key]
